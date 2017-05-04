@@ -2,6 +2,10 @@
 # coding: utf-8
 
 #===================================================
+import sys;
+import os
+#sys.path.append(os.curdir+'/../config/')
+#print(os.curdir+'/../config/')
 from config import Log
 from config import Constant
 #---------------------------------------------------
@@ -52,9 +56,11 @@ def str2qr_terminal(text):
     """
     Log.debug(text)
     qr = qrcode.QRCode()
+    print(qr)
     qr.border = 1
     qr.add_data(text)
     mat = qr.get_matrix()
+    print(mat)
     print_qr(mat)
 
 
@@ -73,9 +79,13 @@ def str2qr_image(text, image_path):
 
 
 def print_qr(mat):
+    import subprocess
+    print('print_qr')
     for i in mat:
         BLACK = Constant.QRCODE_BLACK
         WHITE = Constant.QRCODE_WHITE
+#        subprocess.check_call(["echo", BLACK])
+#        subprocess.check_call(["echo", WHITE])
         echo(''.join([BLACK if j else WHITE for j in i])+'\n')
 
 

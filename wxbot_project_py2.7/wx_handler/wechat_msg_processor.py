@@ -40,6 +40,25 @@ class WeChatMsgProcessor(object):
         self.db.create_table(Constant.TABLE_RECORD_ENTER_GROUP, Constant.TABLE_RECORD_ENTER_GROUP_COL)
         self.db.create_table(Constant.TABLE_RECORD_RENAME_GROUP, Constant.TABLE_RECORD_RENAME_GROUP_COL)
 
+    def _tuling123(self,word):
+        apikey="e20d9bc75fac41eaa3903081e90948e1"
+        url = 'http://www.tuling123.com/openapi/api'
+        _ex='\n[微信机器人自动回复]'
+        word=word+_ex
+        word=word.encode("utf-8")
+        try:
+            r = requests.post(url, data={"key": apikey,"info":word,"loc":"上海外滩","userid":"scmsqhn"})
+            print(r)
+            print(type(r))
+            sthreturn=r.content.decode("utf-8")
+            sthreturn=json.loads(sthreturn)
+            sthreturn=sthreturn["text"]
+            print(sthreturn)
+            return sthreturn
+        except:
+            traceback.print_exc()
+            return "让我一个人静静 T_T..."
+
     def handle_wxsync(self, msg):
         """
         @brief      Recieve webwxsync message, saved into json

@@ -62,6 +62,7 @@ class ConfigManager(object):
             self.cp.get('wechat', 'device_id'),
             float(last_login if last_login else 0),
         ]
+        print(conf)
         return conf
 
     def get_wechat_media_dir(self):

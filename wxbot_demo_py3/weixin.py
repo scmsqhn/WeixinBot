@@ -28,8 +28,8 @@ from socket import timeout as timeout_error
 # for media upload
 import mimetypes
 from requests_toolbelt.multipart.encoder import MultipartEncoder
-
-
+import chardet
+import traceback
 def catchKeyboardInterrupt(fn):
     def wrapper(*args):
         try:
@@ -85,7 +85,7 @@ class WebWeixin(object):
         return description
 
     def __init__(self):
-        self.DEBUG = False
+        self.DEBUG = True
         self.commandLineQRCode = False
         self.uuid = ''
         self.base_uri = ''
@@ -105,7 +105,7 @@ class WebWeixin(object):
         self.GroupMemeberList = []  # 群友
         self.PublicUsersList = []  # 公众号／服务号
         self.SpecialUsersList = []  # 特殊账号
-        self.autoReplyMode = False
+        self.autoReplyMode = True#False
         self.syncHost = ''
         self.user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.109 Safari/537.36'
         self.interactive = False
@@ -440,10 +440,13 @@ class WebWeixin(object):
         return dic
 
     def webwxsendmsg(self, word, to='filehelper'):
+        print(word)
         url = self.base_uri + \
             '/webwxsendmsg?pass_ticket=%s' % (self.pass_ticket)
+        print(url)
         clientMsgId = str(int(time.time() * 1000)) + \
             str(random.random())[:5].replace('.', '')
+        print(clientMsgId)
         params = {
             'BaseRequest': self.BaseRequest,
             'Msg': {
@@ -455,10 +458,15 @@ class WebWeixin(object):
                 "ClientMsgId": clientMsgId
             }
         }
+        print(params)
         headers = {'content-type': 'application/json; charset=UTF-8'}
+        print(headers)
         data = json.dumps(params, ensure_ascii=False).encode('utf8')
+        print(data)
         r = requests.post(url, data=data, headers=headers)
+        print(r.content)
         dic = r.json()
+        print(dic)
         return dic['BaseResponse']['Ret'] == 0
 
     def webwxuploadmedia(self, image_name):
@@ -798,7 +806,10 @@ class WebWeixin(object):
                 #    store
 #自己加的代码-------------------------------------------#
                 if self.autoReplyMode:
-                    ans = self._xiaodoubi(content) + '\n[微信机器人自动回复]'
+#自己加的代码 170428 utf8 ------------------------------#
+                    #ans = self._xiaodoubi(content) + '\n[微信机器人自动回复]'
+                    ans = self._tuling123(content)
+#自己加的代码-------------------------------------------#
                     if self.webwxsendmsg(ans, msg['FromUserName']):
                         print('自动回复: ' + ans)
                         logging.info('自动回复: ' + ans)
@@ -886,12 +897,12 @@ class WebWeixin(object):
                 print('retcode: %s, selector: %s' % (retcode, selector))
             logging.debug('retcode: %s, selector: %s' % (retcode, selector))
             if retcode == '1100':
-                print('[*] 你在手机上登出了微信，债见')
-                logging.debug('[*] 你在手机上登出了微信，债见')
+                print('[*] 你在手机上登出了微信，再见')
+                logging.debug('[*] 你在手机上登出了微信，再见')
                 break
             if retcode == '1101':
-                print('[*] 你在其他地方登录了 WEB 版微信，债见')
-                logging.debug('[*] 你在其他地方登录了 WEB 版微信，债见')
+                print('[*] 你在其他地方登录了 WEB 版微信，再见')
+                logging.debug('[*] 你在其他地方登录了 WEB 版微信，再见')
                 break
             elif retcode == '0':
                 if selector == '2':
@@ -1125,7 +1136,7 @@ class WebWeixin(object):
     def _post(self, url: object, params: object, jsonfmt: object = True) -> object:
         if jsonfmt:
             data = (json.dumps(params)).encode()
-            
+
             request = urllib.request.Request(url=url, data=data)
             request.add_header(
                 'ContentType', 'application/json; charset=UTF-8')
@@ -1151,6 +1162,25 @@ class WebWeixin(object):
 
         return ''
 
+    def _tuling123(self,word):
+        apikey="e20d9bc75fac41eaa3903081e90948e1"
+        url = 'http://www.tuling123.com/openapi/api'
+        _ex='\n[微信机器人自动回复]'
+        word=word+_ex
+        word=word.encode("utf-8")
+        try:
+            r = requests.post(url, data={"key": apikey,"info":word,"loc":"上海外滩","userid":"scmsqhn"})
+            print(r)
+            print(type(r))
+            sthreturn=r.content.decode("utf-8")
+            sthreturn=json.loads(sthreturn)
+            sthreturn=sthreturn["text"]
+            print(sthreturn)
+            return sthreturn
+        except:
+            traceback.print_exc()
+            return "让我一个人静静 T_T..."
+       
     def _xiaodoubi(self, word):
         url = 'http://www.xiaodoubi.com/bot/chat.php'
         try:
@@ -1204,7 +1234,6 @@ class UnicodeStreamFilter:
 
 if sys.stdout.encoding == 'cp936':
     sys.stdout = UnicodeStreamFilter(sys.stdout)
-
 
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)

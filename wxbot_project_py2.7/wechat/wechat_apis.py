@@ -185,7 +185,10 @@ class WXAPI(object):
         if pm:
             code = pm.group(1)
             self.uuid = pm.group(2)
+            print(self.uuid)
+            print('200')
             return code == '200'
+        print('qrcode not get')
         return False
 
     def genqrcode(self):
@@ -205,6 +208,7 @@ class WXAPI(object):
             qrcode_path = save_file('qrcode.jpg', data, './')
             os.startfile(qrcode_path)
         else:
+            print(self.wx_conf['API_qrcode'] + self.uuid)
             str2qr_terminal(self.wx_conf['API_qrcode'] + self.uuid)
 
     def waitforlogin(self, tip=1):
@@ -393,6 +397,9 @@ class WXAPI(object):
         pm = re.search(reg, data)
         retcode = pm.group(1)
         selector = pm.group(2)
+        print('syncheck ok return')
+        print(retcode)
+        print(selector)
         return [retcode, selector]
 
     def webwxsync(self):
@@ -479,8 +486,10 @@ class WXAPI(object):
         """
         url = self.wx_conf['API_webwxsendmsg'] + \
             '?pass_ticket=%s' % (self.pass_ticket)
+        print(url)
         clientMsgId = str(int(time.time() * 1000)) + \
             str(random.random())[:5].replace('.', '')
+        print(clientMsgId)
         params = {
             'BaseRequest': self.base_request,
             'Msg': {
@@ -492,7 +501,9 @@ class WXAPI(object):
                 "ClientMsgId": clientMsgId
             }
         }
+        print(params)
         dic = post(url, params)
+        print(dic)
         return dic
 
     def webwxuploadmedia(self, file_path):
@@ -505,7 +516,7 @@ class WXAPI(object):
         # 计数器
         self.media_count = self.media_count + 1
         fn = file_path
-        # mime_type: 
+        # mime_type:
         #   'application/pdf'
         #   'image/jpeg'
         #   'image/png'
@@ -744,7 +755,11 @@ class WXAPI(object):
         @return     dic   Dict
         """
         url = self.wx_conf['API_webwxpushloginurl'] + '?uin=%s' % uin
+#        url="https://webpush.wx.qq.com/cgi-bin/mmwebwx-bin/synccheck?r=1493780568020&skey=%40crypt_8e9af3d9_388a5c32a296e0b29833a24462acf1d2&sid=6jE0KGSPBsgay2Hz&uin=2149090517&deviceid=e134838682366535&synckey=1_658939056%7C2_658939772%7C3_658939585%7C11_658939767%7C13_658810005%7C201_1493780511%7C203_1493780169%7C1000_1493771547%7C1001_1493771792&_=1493688007877"
+        print('\r\n===associate login')
+        print(url)
         dic = eval(get(url))
+        print(dic)
         return dic
 
     def association_login(self):
@@ -818,7 +833,7 @@ class WXAPI(object):
             data['attachid'] = response['MediaId']
         else:
             Log.error('File upload error')
-        
+
         return self.webwxsendappmsg(user_id, data)
 
     def make_synckey(self, dic):
@@ -967,3 +982,23 @@ class WXAPI(object):
             if name == member['RemarkName'] or name == member['NickName']:
                 return member['UserName']
         return None
+
+    def _tuling123(self,word):
+        apikey="e20d9bc75fac41eaa3903081e90948e1"
+        url = 'http://www.tuling123.com/openapi/api'
+        _ex='\n[微信机器人自动回复]'
+        word=word+_ex
+        word=word#.encode("utf-8")
+        try:
+            r = requests.post(url, data={"key": apikey,"info":word,"loc":"上海外滩","userid":"scmsqhn"})
+            print(r)
+            print(type(r))
+            sthreturn=r.content.decode("utf-8")
+            sthreturn=json.loads(sthreturn)
+            sthreturn=sthreturn["text"]
+            print(sthreturn)
+            return sthreturn
+        except:
+            traceback.print_exc()
+            return "让我一个人静静 T_T..."
+

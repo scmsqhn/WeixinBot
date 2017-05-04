@@ -3,7 +3,10 @@
 
 #===================================================
 from constant import Constant
-from config import ConfigManager
+import sys
+sys.path.append(r'/disk200g/hn/WeixinBot/wxbot_project_py2.7/')
+print(sys.path)
+from config_manager import ConfigManager
 #---------------------------------------------------
 import logging
 import logging.config

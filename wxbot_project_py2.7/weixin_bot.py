@@ -252,6 +252,7 @@ if cm.get('setting', 'server_mode') == 'True':
 
 while True:
     try:
+        # wechat start
         wechat.start()
     except KeyboardInterrupt:
         echo(Constant.LOG_MSG_QUIT)

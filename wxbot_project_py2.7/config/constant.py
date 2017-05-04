@@ -12,6 +12,8 @@ class Constant(object):
 
     QRCODE_BLACK = '\033[40m  \033[0m'
     QRCODE_WHITE = '\033[47m  \033[0m'
+    #QRCODE_BLACK = '\033[36;40m  \033[0m'
+    #QRCODE_WHITE = '\033[36;47mQQ\033[0m'
 
     HTTP_HEADER_USERAGENT = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.109 Safari/537.36')]
     HTTP_HEADER_CONTENTTYPE = ['ContentType', 'application/json; charset=UTF-8']
@@ -20,7 +22,7 @@ class Constant(object):
     HTTP_HEADER_RANGE = ['Range', 'bytes=0-']
 
     REGEX_EMOJI = r'<span class="emoji emoji(\w+)"></span>'
-    
+
     SERVER_LOG_FORMAT = '%(asctime)s - %(pathname)s:%(lineno)d - %(name)s - %(levelname)s - %(message)s'
     SERVER_UPLOAD_ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
     SERVER_PAGE_UPLOAD = 'upload.html'
@@ -109,7 +111,7 @@ class Constant(object):
         ToUserName text,
         AttrStatus text,
         DisplayName text,
-        Name text, 
+        Name text,
         MsgType text,
         FaceMsg text,
         TextMsg text,
@@ -128,7 +130,7 @@ class Constant(object):
     @staticmethod
     def TABLE_GROUP_LIST():
         return 'WeChatRoom_' + time.strftime('%Y%m%d', time.localtime())
-    
+
     TABLE_GROUP_LIST_COL = """
         RoomName text,
         RoomID text,

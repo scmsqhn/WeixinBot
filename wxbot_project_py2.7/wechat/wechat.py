@@ -4,6 +4,7 @@
 #===================================================
 from utils import *
 from wechat_apis import WXAPI
+from wx_handler import WeChatMsgProcessor
 from config import ConfigManager
 from config import Constant
 from config import Log
@@ -57,6 +58,7 @@ class WeChat(WXAPI):
 
     def start(self):
         echo(Constant.LOG_MSG_START)
+        print('run recover')
         run(Constant.LOG_MSG_RECOVER, self.recover)
 
         timeOut = time.time() - self.last_login
@@ -101,8 +103,14 @@ class WeChat(WXAPI):
             run(Constant.LOG_MSG_GET_GROUP_MEMBER, self.fetch_group_contacts)
 
         run(Constant.LOG_MSG_SNAPSHOT, self.snapshot)
+        #------------------------
+        # add by haining.qin 17-05-04
+        # instance a MsgProcessor
+        # msgProcessor = WeChatMsgProcessor()
+        #------------------------
 
         while True:
+            print('enter while 1 login OK')
             [retcode, selector] = self.synccheck()
             Log.debug('retcode: %s, selector: %s' % (retcode, selector))
             self.exit_code = int(retcode)
@@ -120,10 +128,10 @@ class WeChat(WXAPI):
                 if selector == '2':
                     r = self.webwxsync()
                     if r is not None:
-                        try:
+#                        try:
                             self.handle_msg(r)
-                        except:
-                            Log.error(traceback.format_exc())
+#                        except:
+#                            Log.error(traceback.format_exc())
                 elif selector == '7':
                     r = self.webwxsync()
                 elif selector == '0':
@@ -301,6 +309,7 @@ class WeChat(WXAPI):
         return True
 
     def recover(self):
+        print('recover===')
         """
         @brief      Recover from snapshot data.
         @return     Bool: whether operation succeed.
@@ -309,7 +318,9 @@ class WeChat(WXAPI):
         [self.uuid, self.redirect_uri, self.uin,
         self.sid, self.skey, self.pass_ticket,
         self.synckey, device_id, self.last_login] = cm.get_wechat_config()
-
+        print([self.uuid, self.redirect_uri, self.uin,\
+               self.sid, self.skey, self.pass_ticket,\
+               self.synckey, device_id, self.last_login])
         if device_id:
             self.device_id = device_id
 
@@ -394,6 +405,7 @@ class WeChat(WXAPI):
                     self.MemberList.append(m)
 
     def handle_msg(self, r):
+        print('handle_msg')
         """
         @brief      Recover from snapshot data.
         @param      r  Dict: message json
@@ -427,12 +439,28 @@ class WeChat(WXAPI):
                     }
                 # 普通文本消息
                 else:
+                    print('is a normal text')
                     text = content.split(':<br/>')[-1]
                     raw_msg = {
                         'raw_msg': msg,
                         'text': text,
                         'log': text.replace('<br/>', '\n')
                     }
+                    print(text)
+                    #自己加的代码 170428 utf8 ------------------------------#
+                    print(content)
+                    ans = self._tuling123(content)
+                    print('ans===')
+                    print(ans)
+                    #自己加的代码-------------------------------------------#
+                    if self.webwxsendmsg(ans, msg['FromUserName']):
+                        print(msg['FromUserName'])
+                        print('自动回复: ')
+                        print(ans)
+                    else:
+                        print('自动回复失败')
+
+
             elif msgType == self.wx_conf['MSGTYPE_IMAGE']:
                 data = self.webwxgetmsgimg(msgId)
                 fn = 'img_' + msgId + '.jpg'
